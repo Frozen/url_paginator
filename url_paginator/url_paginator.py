@@ -177,32 +177,8 @@ class UrlPaginator(DjangoPaginator):
 
         return p
 
-
-    #
-    # def previous_page_url(self):
-    #     """
-    #     Ссылка на предыдущую страницу
-    #     :return: str
-    #     """
-    #     return furl(self._url).remove(['page']).add({"page": self.number-1}).url
-    #
-    #
-    # def next_page_url(self):
-    #     """
-    #     Ссылка на следующую страницу
-    #     :return: str
-    #     """
-    #     return furl(self._url).remove(['page']).add({"page": self.number+1}).url
-    #
-    # def next_page_number(self):
-    #     """
-    #     Ссылка на следующую страницу
-    #     :return: str
-    #     """
-    #     return self.number
-
-    # def pages(self):
-    #     return self._get_page(object_list=self.object_list, number=self._).pages()
+    def __iter__(self):
+        return iter(self.pages())
 
     def has_next(self):
         return self.number + 1 <= self.num_pages
