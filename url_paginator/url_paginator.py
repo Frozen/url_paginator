@@ -178,7 +178,7 @@ class UrlPaginator(DjangoPaginator):
         return p
 
     def __iter__(self):
-        return iter(self.pages())
+        return iter(self.object_list)
 
     def has_next(self):
         return self.number + 1 <= self.num_pages
