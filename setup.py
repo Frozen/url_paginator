@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='url_paginator',
-    version='0.0.6',
+    version='0.0.7',
     packages=['url_paginator'],
     url='https://github.com/Frozen/url_paginator',
     license='MIT',

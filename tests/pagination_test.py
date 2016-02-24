@@ -49,6 +49,7 @@ class UrlPaginationTest(TestCase):
         pager = UrlPaginator('/search', object_list=list(range(20)), per_page=10)
         i = iter(pager)
         self.assertEqual(0, six.next(i))
+        self.assertEqual(list(range(10)), list(pager))
 
     def test_next(self):
         pager = UrlPaginator('/search', object_list=list(range(20)), per_page=10)

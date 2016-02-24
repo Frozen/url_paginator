@@ -156,7 +156,6 @@ class UrlPaginator(DjangoPaginator):
                 'url': make_full(url, number),
                 'query': make_query(url, number)}
 
-
     def page(self, number=None):
         """
         Returns a Page object for the given 1-based page number.
@@ -173,8 +172,22 @@ class UrlPaginator(DjangoPaginator):
 
         return p
 
+    def _paginate(self, number=None):
+        """
+        Returns a Page object for the given 1-based page number.
+        """
+        if number is not None:
+            number = self.validate_number(number)
+        else:
+            number = self.number
+        bottom = (number - 1) * self.per_page
+        top = bottom + self.per_page
+        if top + self.orphans >= self.count:
+            top = self.count
+        return self.object_list[bottom:top]
+
     def __iter__(self):
-        return iter(self.object_list)
+        return iter(self._paginate(self.number))
 
     def has_next(self):
         return self.number + 1 <= self.num_pages
