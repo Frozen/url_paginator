@@ -2,6 +2,22 @@
 from django.core.paginator import Paginator as DjangoPaginator, Page
 from furl import furl
 
+
+def make_full(url, page):
+    if page != 1:
+        return furl(url).remove(['page']).add({"page": page}).url
+    return furl(url).remove(['page']).url
+
+
+def make_query(url, page):
+    if page != 1:
+        return furl(url).remove(['page']).add({"page": page}).url.split('?')[1]
+    try:
+        return furl(url).remove(['page']).url.split('?')[1]
+    except IndexError:
+        return ""
+
+
 class UrlPage(Page):
     """
     Добавляем возможность ссылки на след страницу
@@ -122,44 +138,24 @@ class UrlPaginator(DjangoPaginator):
         else:
             number = self.validate_number(number)
 
-        def make_full(url, page):
-            if page != 1:
-                return furl(url).remove(['page']).add({"page": page}).url
-            return furl(url).remove(['page']).url
-
-        def make_query(url, page):
-            if page != 1:
-                return furl(url).remove(['page']).add({"page": page}).url.split('?')[1]
-            try:
-                return furl(url).remove(['page']).url.split('?')[1]
-            except IndexError:
-                return ""
-
         pages = []
         for i in range(-3, 0):
             if number + i > 0:
-                pages.append(
-                    {'number': number + i,
-                     'active': False,
-                     'url': make_full(self._url, number + i),
-                     'query': make_query(self._url, number + i)}
-                )
-        pages.append(
-            {'number': number,
-             'active': True,
-             'url': make_full(self._url, number),
-             'query': make_query(self._url, number)}
-        )
+                pages.append(self._gen_page(number + 1, self._url, False))
+
+        pages.append(self._gen_page(number, self._url, True))
 
         for i in range(1, 4):
             if number + i <= self.num_pages:
-                pages.append(
-                    {'number': number + i,
-                     'active': False,
-                     'url': make_full(self._url, number + i),
-                     'query': make_query(self._url, number + i)}
-                )
+                pages.append(self._gen_page(number + 1, self._url, False))
         return pages
+
+    def _gen_page(self, number, url, active):
+        return {'number': number,
+                'active': active,
+                'url': make_full(url, number),
+                'query': make_query(url, number)}
+
 
     def page(self, number=None):
         """
@@ -183,7 +179,17 @@ class UrlPaginator(DjangoPaginator):
     def has_next(self):
         return self.number + 1 <= self.num_pages
 
+    def next(self):
+        if not self.has_next():
+            raise ValueError("no next page")
+        return self._gen_page(self.number + 1, self._url, False)
+
     def has_prev(self):
         return self.number > 1
+
+    def prev(self):
+        if not self.has_prev():
+            raise ValueError("no prev page")
+        return self._gen_page(self.number - 1, self._url, False)
 
 

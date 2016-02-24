@@ -25,6 +25,7 @@ class UrlPaginationTest(TestCase):
     def test_has_page_on_non_first_page(self):
         pager = UrlPaginator('/search', list(range(50)), 10)
         second = pager.pages()[1]
+
         self.assertEqual("/search?page=2", second['url'])
         self.assertEqual(2, second['number'])
 
@@ -47,6 +48,18 @@ class UrlPaginationTest(TestCase):
         pager = UrlPaginator('/search', object_list=list(range(20)), per_page=10)
         i = iter(pager)
         self.assertEqual(0, six.next(i))
+
+    def test_next(self):
+        pager = UrlPaginator('/search', object_list=list(range(20)), per_page=10)
+        n = pager.next()
+        self.assertEqual(2, n['number'])
+
+    def test_prev(self):
+        pager = UrlPaginator('/search?page=2', object_list=list(range(20)), per_page=10)
+        n = pager.prev()
+        self.assertEqual(1, n['number'])
+
+
 
 
 
