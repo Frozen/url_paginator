@@ -15,6 +15,7 @@ class UrlPaginationTest(TestCase):
 
         pages = pager.page(5).pages()
         self.assertEqual(4, len(pages))
+        self.assertEqual([1,2,3,4], [i['number'] for i in pager.pages()])
 
     def test_no_page_on_first_page(self):
         pager = UrlPaginator('/search', list(range(50)), 10)

@@ -141,13 +141,13 @@ class UrlPaginator(DjangoPaginator):
         pages = []
         for i in range(-3, 0):
             if number + i > 0:
-                pages.append(self._gen_page(number + 1, self._url, False))
+                pages.append(self._gen_page(number + i, self._url, False))
 
         pages.append(self._gen_page(number, self._url, True))
 
         for i in range(1, 4):
             if number + i <= self.num_pages:
-                pages.append(self._gen_page(number + 1, self._url, False))
+                pages.append(self._gen_page(number + i, self._url, False))
         return pages
 
     def _gen_page(self, number, url, active):
