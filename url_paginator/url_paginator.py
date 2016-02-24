@@ -32,16 +32,6 @@ class UrlPage(Page):
     def get_previous_url(self):
         return self.previous_page_url()
 
-
-    # def before_previous_page_url(self):
-    #     """
-    #     Ссылка на страницу перед предыдущей
-    #     :return: str
-    #     """
-    #     return furl(self._url).remove(['page']).add({"page": self.number-2}).url
-    #
-    # before_previous_url = before_previous_page_url
-
     def get_next_url(self):
         return self.next_page_url()
 
@@ -133,10 +123,17 @@ class UrlPaginator(DjangoPaginator):
             number = self.validate_number(number)
 
         def make_full(url, page):
-            return furl(url).remove(['page']).add({"page": page}).url
+            if page != 1:
+                return furl(url).remove(['page']).add({"page": page}).url
+            return furl(url).remove(['page']).url
 
         def make_query(url, page):
-            return furl(url).remove(['page']).add({"page": page}).url.split('?')[1]
+            if page != 1:
+                return furl(url).remove(['page']).add({"page": page}).url.split('?')[1]
+            try:
+                return furl(url).remove(['page']).url.split('?')[1]
+            except IndexError:
+                return ""
 
         pages = []
         for i in range(-3, 0):
@@ -169,9 +166,17 @@ class UrlPaginator(DjangoPaginator):
         Returns a Page object for the given 1-based page number.
         """
         if number is not None:
-            return super(UrlPaginator, self).page(number)
+            url = furl(self._url).remove(['page']).add({"page": number}).url
         else:
-            return super(UrlPaginator, self).page(self.number)
+            url = self._url
+
+        p = UrlPaginator(url, object_list=self.object_list,
+                         per_page=self.per_page, orphans=self.orphans,
+                         allow_empty_first_page=self.allow_empty_first_page,
+                         count=self._count)
+
+        return p
+
 
     #
     # def previous_page_url(self):
@@ -198,4 +203,11 @@ class UrlPaginator(DjangoPaginator):
 
     # def pages(self):
     #     return self._get_page(object_list=self.object_list, number=self._).pages()
+
+    def has_next(self):
+        return self.number + 1 <= self.num_pages
+
+    def has_prev(self):
+        return self.number > 1
+
 
