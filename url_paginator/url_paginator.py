@@ -184,7 +184,7 @@ class UrlPaginator(DjangoPaginator):
         top = bottom + self.per_page
         if top + self.orphans >= self.count:
             top = self.count
-        return self.object_list[bottom:top]
+        return self.object_list.all()[bottom:top]
 
     def __iter__(self):
         return iter(self._paginate(self.number))
